@@ -8,7 +8,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "deploy": "ng build --prod && ./nginx.sh start "
   },
   "private": true,
   "dependencies": {
@@ -17,6 +18,7 @@
     "@angular/core": "^2.4.0",
     "@angular/forms": "^2.4.0",
     "@angular/http": "^2.4.0",
+    "@angular/material": "^2.0.0-beta.2",
     "@angular/platform-browser": "^2.4.0",
     "@angular/platform-browser-dynamic": "^2.4.0",
     "@angular/router": "^3.4.0",
