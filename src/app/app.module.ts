@@ -4,31 +4,35 @@ import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AppComponent } from './app.component';
+import { MaterialModule } from '@angular/material'
+import { AngularFireModule, AuthProviders, AuthMethods } from 'angularfire2';
 
-import { RouterModule, Routes } from '@angular/router';
-import { ClubsModule } from './clubs/clubs.module';
-import { ClubDetailedComponent } from './club-detailed/club-detailed.component';
+import 'hammerjs';
 
-const appRoutes: Routes = [
-  { path: '',
-    pathMatch: 'full',
-    component : AppComponent
-  },
-  { path: '**', redirectTo: '' }
-];
+const firebaseConfig = {
+ apiKey: "AIzaSyBHbjed1U3qhrKHjvuANgEzf9TuWsQee9s",
+    authDomain: "hhhd-27e4f.firebaseapp.com",
+    databaseURL: "https://hhhd-27e4f.firebaseio.com",
+    storageBucket: "hhhd-27e4f.appspot.com",
+    messagingSenderId: "394432419968"
+}
+
+export const firebaseAuthConfig = {
+  provider: AuthProviders.Anonymous,
+  method: AuthMethods.Anonymous,
+};
 
 
 @NgModule({
   declarations: [
   AppComponent,
-  ClubDetailedComponent,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(appRoutes),
-    ClubsModule
+    MaterialModule,
+    AngularFireModule.initializeApp(firebaseConfig,firebaseAuthConfig),
   ],
   providers: [],
   bootstrap: [AppComponent]
