@@ -37,7 +37,7 @@ export class Club {
 
 
 	
-	<md-tab-group dynamicHeight='true' >
+	<md-tab-group dynamicHeight='false' >
 
 
 
@@ -65,17 +65,18 @@ export class Club {
 
       <div class="form-group">
         <label for="description">Description</label>
-        <input type="text" class="form-control" id="description"
-               [(ngModel)]="model.description" name="description">
+        
+       <textarea type="text" class="form-control" id="description"
+               [(ngModel)]="model.description" name="description"></textarea>
       </div>
 
       <div class="form-group">
         <label for="image">Image</label>
         <input type='file' class="form-control" id="image"
-                required accept="image/png,image/gif,image/jpeg"
-                [(ngModel)]="model.imageurl" name="image"
+                 accept="image/png,image/gif,image/jpeg"
+                (ngModel)="model.imageurl" name="image"
                 #image="ngModel" (change)='updatePreview($event.target.files[0])' style="padding:unset">
-		<img [hidden]="image.invalid || image.pristine || !model.preview" src='{{model.preview}}' style="max-width:100%;max-height:100%;">                
+		<img [hidden]="!model.imageurl && !model.preview" src='{{model.preview != null ? model.preview : model.imageurl }}' style="max-width:100%;max-height:100%;">                
         <div [hidden]="image.valid || image.pristine" class="alert alert-danger">
           Power is required
         </div>
@@ -83,7 +84,7 @@ export class Club {
 
       <button type="submit" class="btn btn-success" [disabled]="!clubForm.form.valid">Submit</button>
       <button type="button" class="btn btn-default" (click)="newClub(); clubForm.reset()">New Club</button>
-      <i>with</i> reset
+      
 
      
     </form>
@@ -109,25 +110,7 @@ export class Club {
   </div>
 </div>
 
-<md-grid-list rowHeight="1:1" style="" cols="{{ 2}}"  >
-<md-grid-tile  >
-<div class="club-card" [style.background-image]="'url(' + club.imageurl + ')'"  style="width:100%;height:100%;background-repeat:no-repeat; background-position:center center;background-size:cover;" >
 
-      <md-grid-tile-header>
-      <md-input-container ><input mdInput [(ngModel)] = 'club.name'/> </md-input-container> </md-grid-tile-header>
-
-  <input #imagepicker  type=file (change)='onChange($event.target.files[0])' style="display:none;position:absolute;" /> 
-    <md-input-container style="position:absolute; bottom:10%">
-    	<textarea mdInput [(ngModel)] ='club.description' placeholder='Descripton'> </textarea>
-    </md-input-container >
-  <md-grid-tile-footer  >
-    <button md-button (click)='imagepicker.click()'>load logo</button>
-    <button md-button (click)='addNew()'>add</button>
-    <button md-button (click)='update(club)'>edit</button>
-  </md-grid-tile-footer>
-</div >
-	</md-grid-tile>
-</md-grid-list>
 
 </md-tab>
 
@@ -142,72 +125,97 @@ export class Club {
 
   <md-tab label="View details">
 
-<md-sidenav-container>
-  <md-sidenav mode="over" opened="false" style=" width: 20%; " #sidenav>
+<md-sidenav-container style="max-height:100%">
+  <md-sidenav mode="push" opened="false" style=" width: 20%;min-width:200px " #sidenav>
 <md-list>
-  <md-list-item  style="max-height:inherit;width:100%" *ngFor="let key of viewitemkeys">
+  <md-list-item  style="max-height:100%;width:100%" *ngFor="let key of viewitemkeys">
+     <img md-list-avatar onError='this.src = "https://duckduckgo.com/hiring/illustrations/logo.svg"' src='{{viewitems[key].imageurl}}' style="max-height:100%;max-width:100%;">
      <a md-line >{{ viewitems[key].name }}</a>
-     <img md-list-avatar src='{{viewitems[key].imageurl}}' style="max-height:inherit;max-width:inherit;">
-     <button md-icon-button (click)="viewDetail(viewitems[key])">
+     <button md-icon-button (click)="viewDetail(key,viewitems[key])">
         <md-icon>info</md-icon>
      </button>
   </md-list-item>
 </md-list>
     
   </md-sidenav>
- 
-<md-grid-list rowHeight="1:1" style="" cols="{{ 2}}"  >
-<md-grid-tile  >
-<div class="club-card" [style.background-image]="'url(' + clubview.imageurl + ')'"  style="width:100%;height:100%;background-repeat:no-repeat; background-position:center center;background-size:cover;" >
-      <md-grid-tile-header>{{clubview.name}}</md-grid-tile-header>
-  
-  <md-grid-tile-footer>
-  	<p>{{clubview.description}}</p>
-    <button md-button (click)="clubEdit(clubview)">edit </button>
-  </md-grid-tile-footer>
-</div >
-	</md-grid-tile>
-</md-grid-list>
+    
 
-
-<md-card class="club-card" style="width:50%">
-  <md-card-header>
-    <div md-card-avatar class="example-header-image"></div>
-    <md-card-title>{{clubview.name}}</md-card-title>
-  </md-card-header>
-  <img md-card-image [src]="clubview.imageurl" >
-  <md-card-content>
-    <p>
-      {{clubview.description}}
+<md-card class="example-card" *ngIf='clubview.$key && viewitems[clubview.$key]'>
+    <div md-card-avatar class="example-header-image">
+    <md-list>
+    <md-list-item >
+    <img md-list-avatar [src]="viewitems[clubview.$key].imageurl" style="margin:auto;max-width:100%;max-height:100%">
+    <a md-line >{{viewitems[clubview.$key].name}}</a>
+    </md-list-item>
+    
+    <p md-line style="padding: 0 16px;white-space:unset;height:unset;word-break:break-all">
+        {{viewitems[clubview.$key].description}}
     </p>
-  </md-card-content>
-  <md-card-actions>
-    <button md-button (click)="clubEdit(clubview)">edit </button>
-  </md-card-actions>
+    
+    <md-list-item >
+    <button md-button style="flex:1" (click)='editItem(clubview.$key,viewitems[clubview.$key])'>EDIT</button>
+    </md-list-item>
+    </md-list>
+    <md-list-item >
+    <img style="max-width:100%;max-height:100%" [src]="viewitems[clubview.$key].imageurl">
+    </md-list-item>
+    </div>
 </md-card>
+
+
+
    
     <div style="position:fixed;top:50px;right:50px;z-index=99"> <button md-mini-fab (click)='sidenav.toggle()' > <md-icon>add</md-icon></button></div>
+
   </md-sidenav-container>
   </md-tab>
 
 
 
 
-<md-tab label="List ">
-<md-grid-list rowHeight="1:1" style="" cols="{{ 4}}"  *ngIf='activated'>
+<md-tab label="Logo list">
+<md-grid-list rowHeight="1:1" style="" cols="{{ 2}}"  *ngIf='activated'>
 <md-grid-tile  *ngFor="let key of viewitemkeys">
 
-<div class="club-card" *ngIf='viewitems.hasOwnProperty(key)' style.background-image="{{'url(' + viewitems[key].imageurl + ')'}}"  style="width:100%;height:100%;background-repeat:no-repeat; background-position:center center;background-size:cover;" >
-      <md-grid-tile-header>{{viewitems[key].name}}</md-grid-tile-header>
+<button md-button (click)='viewDetail(key)' style='opacity:1;width:100%;height:100%;padding:0;' >
+<div class="club-card" *ngIf='viewitems.hasOwnProperty(key)'  style.background-image="{{'url(' + viewitems[key].imageurl + ')'}}"  style="width:100%;height:100%;background-repeat:no-repeat; background-position:center center;background-size:cover;" >
+
+      <md-grid-tile-header style='text-overflow:ellipsis;overflow-x:hidden;white-space:nowrap
+      ;display:block;'>{{viewitems[key].name}}</md-grid-tile-header>
   
-  <md-grid-tile-footer>
-    <button md-button>View</button>
+  <md-grid-tile-footer style='display:none'>
   </md-grid-tile-footer>
 </div >
+    </button>
 	</md-grid-tile>
 </md-grid-list>
+</md-tab>
+
+<md-tab label="Detailed list">    
+<md-card class="example-card"  style="margin:4px;padding:1px;" *ngFor='let key of viewitemkeys'>
+    <div md-card-avatar class="example-header-image" >
+    <md-list>
+    <md-list-item >
+    <img md-list-avatar [src]="viewitems[key].imageurl" style="margin:auto;max-width:100%;max-height:100%">
+    <a md-line >{{viewitems[key].name}}</a>
+    </md-list-item>
     
-  </md-tab>
+    <p md-line style="padding: 0 16px;white-space:unset;height:unset;word-break:break-all">
+        {{viewitems[key].description}}
+    </p>
+    
+    <md-list-item >
+    <button md-button (click)='editItem(key,viewitems[key])' style="width:50%">EDIT</button>
+    <button md-button (click)='viewDetail(key)' style="width:50%">VIEW</button>
+    </md-list-item>
+    </md-list>
+    <md-list-item >
+    <img style="max-width:100%;max-height:100%" [src]="viewitems[key].imageurl">
+    </md-list-item>
+    </div>
+</md-card>
+
+</md-tab>
 
 </md-tab-group>
 
@@ -269,6 +277,7 @@ export class AppComponent {
   }
   public viewitemsworkerchanged = (item,prev) =>{
 	    		console.log(prev+' '+item.key+' '+ JSON.stringify(item.val()) ) ;
+          this.viewitems[item.key] = item.val();
 	    		if(item.val() && item.val().imageurl)
 	    		{
 	    			let storRef = this.firebaseApp.storage().ref('images/'+item.key);
@@ -383,11 +392,8 @@ export class AppComponent {
   	reader.readAsDataURL(file);
   	
   }
-  	public viewDetail(item){
-  		this.clubview.name = item.name;
-  		this.clubview.description = item.description;
-  		this.clubview.imageurl = item.imageurl;
-  		this.clubview.$key = item.$key;
+  	public viewDetail(key){
+  		this.clubview.$key = key;
   	}
 
   
@@ -397,14 +403,27 @@ export class AppComponent {
   uploadTask;
   submitted = false;
 
+  editItem(key,item){
+    if(this.model.$key != key)
+    {
+      this.model.$key = key;
+      this.model.name = item.name;
+      this.model.preview = null;
+      this.model.imageurl = item.imageurl;
+      this.model.description = item.description;
+      this.uploadTask = null;
+    }
+  }
+
   onSubmit() {
-  	let postRef;
-  	if(!this.model.$key){
-    	postRef = this.firebaseApp.database().ref('clubs').push();
-    	this.model.$key = postRef.key;
+   	this.submitted = true; 
+    let postRef;
+    if(!this.model.$key){
+      postRef = this.firebaseApp.database().ref('clubs').push();
+      this.model.$key = postRef.key;
     }
     else{
-    	postRef = this.firebaseApp.database().ref('clubs/'+this.model.$key)
+      postRef = this.firebaseApp.database().ref('clubs/'+this.model.$key)
     }
     let storRef = this.firebaseApp.storage().ref('images/'+this.model.$key);
     
@@ -412,24 +431,23 @@ export class AppComponent {
 
     if(!this.model.preview)
     {
-    	console.log('preview  == null')
-    	return;
+      console.log('preview  == null')
+      return;
     }
 
 
     if(this.uploadTask)
     {
-    	this.uploadTask.cancel();
+      this.uploadTask.cancel();
     }
 
-    this.uploadTask = storRef.putString(this.model.preview,'data_url').then(()=>{
-    	postRef.update({imageurl:'gs://'+storRef.bucket+'/'+storRef.fullPath});
-    });
-   	this.submitted = true; 
+    this.uploadTask = storRef.putString(this.model.preview,'data_url')
+    this.uploadTask.then(()=>{
+      postRef.update({imageurl:'gs://'+storRef.bucket+'/'+storRef.fullPath});
+    }).catch((e)=>{});
 	}
 
-  // TODO: Remove this when we're done
-  get diagnostic() { return JSON.stringify(this.model); }
+  
 
   newClub() {
   	this.model.reset();    
