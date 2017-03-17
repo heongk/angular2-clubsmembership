@@ -7,6 +7,7 @@
     "https://www.gstatic.com/firebasejs/3.7.1/firebase-messaging.js",
     "https://www.gstatic.com/firebasejs/3.7.1/firebase.js"]
     var a = a.slice();
+    var readycount = 0;
     for (var i = 0; i < 5; ++i)
     {
 
@@ -15,25 +16,38 @@
       script.src = a[i]
       script.type = 'text/javascript';
       script.onload = function() {
+        readycount += 1;
+        if(readycount == 5)
+        {
+              var firebaseConfig = {
+               apiKey: "AIzaSyBHbjed1U3qhrKHjvuANgEzf9TuWsQee9s",
+                  authDomain: "hhhd-27e4f.firebaseapp.com",
+                  databaseURL: "https://hhhd-27e4f.firebaseio.com",
+                  storageBucket: "hhhd-27e4f.appspot.com",
+                  messagingSenderId: "394432419968"
+              }
+              window.firebase.initializeApp(firebaseConfig);
+              window.firebase.auth().signInAnonymously();
+              window.firebase.auth().onAuthStateChanged(function(auth){console.log(auth.uid+' auth')});
+              window.viewitems = new Array();
+              window.fdata = window.firebase.database();
+              window.clubref = window.fdata.ref('clubs');
+              //window.subscriber = window.clubref.on('child_added',(item,prev)=>console.log(prev+' '+item.key+' '+ JSON.stringify(item.val()) ) );
+              window.subscriber =   window.firebase.database().ref('clubs').on('child_added', ((item,prev)=>{
+          console.log(prev+' '+item.key+' '+ JSON.stringify(item.val()) ) ;
+          window.viewitems[item.key] = item.val();
+        }))
+
+        }
           console.log(a[i].toString()+' ready')
       };
       document.getElementsByTagName("body")[0].appendChild(script);
     }
 })();
   
-var firebaseConfig = {
- apiKey: "AIzaSyBHbjed1U3qhrKHjvuANgEzf9TuWsQee9s",
-    authDomain: "hhhd-27e4f.firebaseapp.com",
-    databaseURL: "https://hhhd-27e4f.firebaseio.com",
-    storageBucket: "hhhd-27e4f.appspot.com",
-    messagingSenderId: "394432419968"
-}
 
-  window.firebase.initializeApp(firebaseConfig);
-  window.firebase.auth().signInAnonymously()
-  window.firebase.auth().onAuthStateChanged(function(auth){console.log(auth.uid+' auth')})
 
-  var storage = firebase.storage();
+  var storage = window.firebase.storage();
   var pathReference = storage.ref('images/clavesin.jpg');
   pathReference.getDownloadURL()
   pathReference.getDownloadURL().then(function(url) { 
