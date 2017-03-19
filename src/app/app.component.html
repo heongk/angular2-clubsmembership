@@ -89,7 +89,7 @@
 
 
 
-  <md-tab label="View details" *ngIf='clubview.$key && viewitems[clubview.$key];'>
+  <md-tab label="View details" [disabled]='clubview.$key == null || viewitems[clubview.$key] == null'>
 
 <md-sidenav-container style="max-height:100%">
   <md-sidenav mode="push" opened="false" style=" width: 20%;min-width:200px " #sidenav>
@@ -106,7 +106,7 @@
   </md-sidenav>
     
 
-<md-card class="example-card" >
+<md-card class="example-card" *ngIf='clubview.$key != null && viewitems[clubview.$key] != null'>
     <div md-card-avatar class="example-header-image">
     <md-list>
     <md-list-item >
