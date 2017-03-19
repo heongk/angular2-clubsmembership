@@ -1,0 +1,20 @@
+{
+    "rules": {
+      "messages": {
+          ".write": "auth !== null",
+          ".read": "auth !== null"
+      },
+        "clubs": {
+          ".write": "auth !== null",
+          ".read": "auth !== null"
+      },
+      "todos": {
+        "$uid": {
+          // grants write access to the owner of this user account whose uid must exactly match the key ($uid)
+          ".write": "auth !== null && auth.uid === $uid",
+          // grants read access to any user who is logged in with Facebook
+          ".read": "auth !== null && auth.uid === $uid"
+        }
+      }
+    }
+}
